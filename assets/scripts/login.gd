@@ -5,6 +5,9 @@ const URL = "http://127.0.0.1:8000/api/login/"
 
 # Função chamada quando o botão é pressionado
 func _on_pressed():
+	var ws = get_node("/root/Client")
+	ws.start = true
+	ws.SOCKET.connect_to_url("ws://localhost:8000/ws/game/")
 	
 	http_request.request_completed.connect(_on_request_completed)
 	
@@ -42,6 +45,6 @@ func _on_pressed():
 #     else:
 #         print("Erro na requisição:", response_code)
 
-func _on_request_completed(_result, _response_code, headers, body):
+func _on_request_completed(_result, _response_code, _headers, body):
 	var recebido = JSON.parse_string(body.get_string_from_utf8())
 	print(recebido)
