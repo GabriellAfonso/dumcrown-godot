@@ -17,8 +17,10 @@ config/icon="res://icon.svg"
 
 [autoload]
 
+Urls="*res://assets/scripts/client/urls.gd"
+Codes="*res://assets/scripts/client/codes.gd"
 ClientSocket="*res://assets/scripts/client/ClientSocket.gd"
-SocketThread="*res://assets/scripts/client/socketThread.gd"
+SocketThread="res://assets/scripts/client/socketThread.gd"
 
 [debug]
 

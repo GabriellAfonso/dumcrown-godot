@@ -1,39 +1,36 @@
 extends Node
 var thread = Thread.new()
 var connected = false
+var can_disconnect
+var url
+var codes
 var state
-
+var token
 var ping_time = 0
 var pong_time = 0
 var latency_ms = 0
 
 var SOCKET := WebSocketPeer.new()
 
-var code_handlers = {
-    'connected': '_connected_with_Server',
-    'pong': 'ping',
-    'ranking_update': 'handle_ranking_update',
-    # Adicione outros tipos de mensagens e métodos de manipulação conforme necessário
-}
+var code_handlers
+
+func _ready():
+    url = get_node("/root/Urls")
+    codes = get_node("/root/Codes")
+    code_handlers = codes.handlers
 
 func _connect():
-
-    var token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxfQ.86bZyALOgsNr--DeTG18IqJtLqi7nvo5cuCAgNKPRdU'
-    var url = "ws://localhost:8000/ws/game/?token=" + token # Adicione o token como parâmetro de consulta, se necessário
-
+    can_disconnect = true
     print('Conectando...')
-    SOCKET.connect_to_url(url)
-    # print('conectando...')
-    # SOCKET.connect_to_url("ws://localhost:8000/ws/game/", headers)
+    SOCKET.connect_to_url(url.WEB_SOCKET + token)
 
 func _disconnect():
     connected = false
+    can_disconnect = false
+    # add reconecting scene here
     print('desconectado')
-    await get_tree().create_timer(3).timeout
+    await get_tree().create_timer(2).timeout
     reconnect()
-
-func _ready():
-    pass
 
 func _process(_delta):
     SOCKET.poll()
@@ -41,7 +38,7 @@ func _process(_delta):
     if state == SOCKET.STATE_OPEN:
         receive()
     elif state == SOCKET.STATE_CLOSED:
-        if connected:
+        if can_disconnect:
             _disconnect()
 
 func receive():
@@ -68,9 +65,9 @@ func reconnect():
     print('reconectando')
     _connect()
 
-#fazer uma funçao pra ver se ta conectado e retornando algo caso nao esteja
 func _connected_with_Server():
     connected = true
+    # exit reconnect scene here
     print('conectado ao servidor')
     ping()
 
